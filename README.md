@@ -4,5 +4,13 @@ Gatolate é uma loja (fictícia) de venda de chocolates. O CEO, Willy Wonka, sol
 
 Após uma conversa extensa, foram definidos [os blocos e os KPIs](https://github.com/luhm/gatolate/blob/main/kpis.md) de análise.
 
+## Dashboards
 
+[Dashboard Bloco-1]()
+
+[Dashboard Bloco-2]()
+
+[Dashboard Bloco-3]()
+
+[Dashboard Bloco-4](https://gatolate-bloco4-geografico.streamlit.app/)
 
