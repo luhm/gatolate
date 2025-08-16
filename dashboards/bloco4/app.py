@@ -15,6 +15,7 @@ st.set_page_config(
 # --- Carregamento dos dados ---
 df = pd.read_csv("https://raw.githubusercontent.com/luhm/gatolate/refs/heads/main/data/chocolate_sales_cleaned.csv")
 
+df['Date'] = pd.to_datetime(df['Date'], infer_datetime_format=True)
 
 # --- Barra Lateral (criação de filtros) ---
 st.sidebar.header("🔍 Filtros")
@@ -37,19 +38,19 @@ st.markdown("Explore os dados das vendas de chacolates da Gatolate na perspectiv
 st.subheader("Métricas gerais (Vendas gerais)")
 
 if not df_filtrado.empty:
-    total_vendas = df_filtrado['Boxes Shipped'].sum()
+    qnt_vendas = df_filtrado['Boxes Shipped'].sum()
     pais_compra_mais = df_filtrado['Country'].mode()[0]
     chocolate_mais_vendido = df_filtrado['Product'].max()
     valor_total_arrecadado = df_filtrado["Amount"].sum()
 else:
-    total_vendas, media_de_vendas, chocolate_mais_vendido, valor_total_arrecadado = 0, 0, 0, ""
+    qnt_vendas, pais_compra_mais, chocolate_mais_vendido, valor_total_arrecadado = 0, 0, 0, ""
 
 col1, col2 = st.columns(2) ## divide as informações em colunas na página
-col1.metric("Total de Vendas", f"${total_vendas:,.0f}")
+col1.metric("Quantidade total de caixas vendidas", qnt_vendas)
 col2.metric("País que mais compra", pais_compra_mais)
 
 col3, col4 = st.columns(2)
-col3.metric("Valor total arrecadad (em USD)", valor_total_arrecadado)
+col3.metric("Valor total arrecadado (em USD)", f"${valor_total_arrecadado:,.0f}")
 col4.metric("Chocolate mais vendido", chocolate_mais_vendido)
 
 st.markdown("---")
@@ -57,7 +58,7 @@ st.markdown("---")
 # --- Análises Visuais com Plotly ---
 st.subheader("Gráficos")
 
-warning = st.warning("Nenhum dado para exibir no gráfico de países.")
+warning = "Nenhum dado para exibir no gráfico de países."
 
 if not df_filtrado.empty:
     country_sales = df_filtrado.groupby('Country_iso3')['Amount'].sum().sort_values(ascending=True).reset_index()
@@ -77,13 +78,16 @@ col_graf2, col_graf3 = st.columns(2)
 
 with col_graf2:
     if not df_filtrado.empty:
-        grafico_receita_pais = px.bar(country_sales,
-                    x='Amount',
-                    y='Country_iso3',
-                    orientation='h',
-                    title='Receita por país (USD)',
-                    color='Amount',
-                    color_continuous_scale='rdylgn') 
+        receita_pais = df.groupby('Country')['Amount'].sum().sort_values(ascending=True).reset_index()
+        grafico_receita_pais = px.bar(
+              receita_pais,
+              x='Amount',
+              y='Country',
+              # orientation='h',
+              title='Receita por país (USD)',
+              labels={'Amount': 'USD', 'Country': 'País'},
+              color='Amount',
+              color_continuous_scale='rdylgn') 
         grafico_receita_pais.update_layout(title_x=0.1)
         st.plotly_chart(grafico_receita_pais, use_container_width=True)
     else:
@@ -97,6 +101,7 @@ with col_graf3:
              x='Amount',
              y='Country',
              title='Ticket Médio por país (USD)',
+             labels={'Amount': 'USD', 'Country': 'País'},
              color='Amount',
              color_continuous_scale='rdylgn')
         st.plotly_chart(ticket_medio, use_container_width=True)
@@ -112,8 +117,9 @@ with col_graf4:
              x='Product',
              y='Boxes Shipped',
              title='Top 5 Produtos mais vendidos',
+             labels={'Product': 'Produto', 'Boxes Shipped': 'Caixas'},
              color='Boxes Shipped',
-             color_continuous_scale='Blues')
+             color_continuous_scale='Greens')
         st.plotly_chart(qnt_por_pais, use_container_width=True)
     else:
         st.write(warning)
@@ -126,8 +132,9 @@ with col_graf5:
              x='Product',
              y='Amount',
              title='Top 5 Produtos que geram mais receita (USD)',
+             labels={'Amount': 'USD', 'Product': 'Produto'},
              color='Amount',
-             color_continuous_scale='Blues')
+             color_continuous_scale='Greens')
         st.plotly_chart(amount_por_pais, use_container_width=True)
     else:
         st.write(warning)
@@ -147,9 +154,9 @@ with col_graf6:
              y='Amount',
              title='Receita geral por trimestre',
              color='Amount',
-             color_continuous_scale='Greens',
-             labels={'Quarter': 'Trimestre'})
-        receita_trimestral_pais.update_xaxes(tickvals=quarterly_revenue['Quarter'])
+             color_continuous_scale='Blues',
+             labels={'Quarter': 'Trimestre', 'Amount': 'USD'})
+        receita_trimestral_pais.update_xaxes(tickvals=receita_trimestral['Quarter'])
         st.plotly_chart(receita_trimestral_pais, use_container_width=True)
     else:
         st.write(warning)
