@@ -4,13 +4,13 @@ Gatolate é uma loja (fictícia) de venda de chocolates. O CEO, Willy Wonka, sol
 
 Após uma conversa extensa, foram definidos [os blocos e os KPIs](https://github.com/luhm/gatolate/blob/main/kpis.md) de análise.
 
-Na pasta `data` é possível encontrar os dados em formato csv puro e já limpo.
+Para que toda a equipe tenha acesso e acompanhe o desenvolvimento desse projeto, este repositório foi criado com a seguinte estrutura:
 
-Na pasta `análises` é possível encontrar os códigos utilizados nas análises e os relatórios finais.
+- Na pasta `data` é possível encontrar os dados em formato csv puro e já limpo.
+- Na pasta `análises` é possível encontrar os códigos utilizados nas análises e os relatórios finais.
+- Na pasta `dashboards` é possível encontrar o código completo do deploy do dashboard no streamlit.
 
-Na pasta `dashboards` é possível encontrar o código completo do deploy do dashboard no streamlit.
-
-Abaixo voce encontra a lista com os links diretos para os dashboards deployados.
+Abaixo voce encontra a lista com os links diretos para os dashboards já criados.
 
 ## Dashboards
 
