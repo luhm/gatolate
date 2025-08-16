@@ -57,6 +57,7 @@ st.markdown("---")
 # --- Análises Visuais com Plotly ---
 st.subheader("Gráficos")
 
+warning = st.warning("Nenhum dado para exibir no gráfico de países.")
 
 if not df_filtrado.empty:
     country_sales = df_filtrado.groupby('Country_iso3')['Amount'].sum().sort_values(ascending=True).reset_index()
@@ -69,7 +70,7 @@ if not df_filtrado.empty:
     grafico_paises.update_layout(title_x=0.1)
     st.plotly_chart(grafico_paises, use_container_width=True)
 else:
-    st.warning("Nenhum dado para exibir no gráfico de países.")        
+    st.write(warning)        
 
 col_graf2, col_graf3 = st.columns(2)
 
@@ -86,7 +87,7 @@ with col_graf2:
         grafico_receita_pais.update_layout(title_x=0.1)
         st.plotly_chart(grafico_receita_pais, use_container_width=True)
     else:
-        st.warning("Nenhum dado para exibir no gráfico de países.")
+        st.write(warning)
 
 with col_graf3:
     if not df_filtrado.empty:
@@ -100,7 +101,58 @@ with col_graf3:
              color_continuous_scale='rdylgn')
         st.plotly_chart(ticket_medio, use_container_width=True)
     else:
-        st.warning("Nenhum dado para exibir no gráfico de países.")
+        st.write(warning)
 
-  
+col_graf4, col_graf5 = st.columns(2)
+
+with col_graf4:
+    if not df_filtrado.empty:
+        product_qnt = df_filtrado.groupby('Product')['Boxes Shipped'].sum().sort_values(ascending=False).head(5).reset_index()
+        qnt_por_pais = px.bar(product_qnt,
+             x='Product',
+             y='Boxes Shipped',
+             title='Top 5 Produtos mais vendidos',
+             color='Boxes Shipped',
+             color_continuous_scale='Blues')
+        st.plotly_chart(qnt_por_pais, use_container_width=True)
+    else:
+        st.write(warning)
+ 
+with col_graf5:
+    if not df_filtrado.empty:
+        product_amount = df_filtrado.groupby('Product')['Amount'].sum().sort_values(ascending=False).head(5).reset_index()
+        amount_por_pais = px.bar(
+            product_amount,
+             x='Product',
+             y='Amount',
+             title='Top 5 Produtos que geram mais receita (USD)',
+             color='Amount',
+             color_continuous_scale='Blues')
+        st.plotly_chart(amount_por_pais, use_container_width=True)
+    else:
+        st.write(warning)
+
+st.markdown("---")
+
+st.subheader("Análises por trimestre")
+
+col_graf6, col_graf7 = st.columns(2)
+
+with col_graf6:
+    if not df_filtrado.empty:
+        df_filtrado['Quarter'] = df_filtrado['Date'].dt.quarter
+        receita_trimestral = df_filtrado.groupby('Quarter')['Amount'].sum().reset_index()
+        receita_trimestral_pais = px.bar(receita_trimestral,
+             x='Quarter',
+             y='Amount',
+             title='Receita geral por trimestre',
+             color='Amount',
+             color_continuous_scale='Greens',
+             labels={'Quarter': 'Trimestre'})
+        receita_trimestral_pais.update_xaxes(tickvals=quarterly_revenue['Quarter'])
+        st.plotly_chart(receita_trimestral_pais, use_container_width=True)
+    else:
+        st.write(warning)
+
+
 
