@@ -15,6 +15,7 @@ st.set_page_config(
 # --- Carregamento dos dados ---
 df = pd.read_csv("https://raw.githubusercontent.com/luhm/gatolate/refs/heads/main/data/chocolate_sales_cleaned.csv")
 
+
 # --- Barra Lateral (criação de filtros) ---
 st.sidebar.header("🔍 Filtros")
 
@@ -52,3 +53,54 @@ col3.metric("Valor total arrecadad (em USD)", valor_total_arrecadado)
 col4.metric("Chocolate mais vendido", chocolate_mais_vendido)
 
 st.markdown("---")
+
+# --- Análises Visuais com Plotly ---
+st.subheader("Gráficos")
+
+
+if not df_filtrado.empty:
+    country_sales = df_filtrado.groupby('Country_iso3')['Amount'].sum().sort_values(ascending=True).reset_index()
+    grafico_paises = px.choropleth(country_sales,
+                locations='Country_iso3',
+                color='Amount',
+                hover_name='Country_iso3',
+                color_continuous_scale='rdylgn',
+                title='Onde estamos vendendo mais? (valores absolutos)') # Added a color scale
+    grafico_paises.update_layout(title_x=0.1)
+    st.plotly_chart(grafico_paises, use_container_width=True)
+else:
+    st.warning("Nenhum dado para exibir no gráfico de países.")        
+
+col_graf2, col_graf3 = st.columns(2)
+
+
+with col_graf2:
+    if not df_filtrado.empty:
+        grafico_receita_pais = px.bar(country_sales,
+                    x='Amount',
+                    y='Country_iso3',
+                    orientation='h',
+                    title='Receita por país (USD)',
+                    color='Amount',
+                    color_continuous_scale='rdylgn') 
+        grafico_receita_pais.update_layout(title_x=0.1)
+        st.plotly_chart(grafico_receita_pais, use_container_width=True)
+    else:
+        st.warning("Nenhum dado para exibir no gráfico de países.")
+
+with col_graf3:
+    if not df_filtrado.empty:
+        country_mean = df.groupby('Country')['Amount'].mean().sort_values(ascending=True).reset_index()
+        ticket_medio = px.bar(
+            country_mean,
+             x='Amount',
+             y='Country',
+             title='Ticket Médio por país (USD)',
+             color='Amount',
+             color_continuous_scale='rdylgn')
+        st.plotly_chart(ticket_medio, use_container_width=True)
+    else:
+        st.warning("Nenhum dado para exibir no gráfico de países.")
+
+  
+
