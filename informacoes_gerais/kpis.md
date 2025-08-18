@@ -10,7 +10,7 @@ KPI 2 – Total de Caixas Enviadas → Responde: “Quantas unidades foram vendi
 
 KPI 3 – Valor Médio por Venda → Responde: “Qual é o ticket médio das vendas?”
 
-KPI 4 – País com Maior Receita → Responde: “Qual país mais vende?”
+KPI 4 – País com Maior Receita → Responde: “Qual país mais vende?” --> Bloco 4
 
 KPI 5 – Produto Mais Vendido (por receita) → Responde: “Qual é o campeão de vendas?”
 
