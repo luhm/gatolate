@@ -19,7 +19,7 @@ df['Date'] = pd.to_datetime(df['Date'], infer_datetime_format=True)
 
 # --- Criação das abas ---
 
-tab1, tab2, tab3, tab4 = st.tabs(["Metricas gerais", "Onde vendemos e ganhamos mais", "Análises Trimestrais", "Análises por vendedor"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["Metricas gerais", "Onde vendemos e ganhamos mais", "Análises Trimestrais", "Análises por vendedor", "Análises por produto"])
 
 warning = "Nenhum dado para exibir no gráfico de países."
 
@@ -83,7 +83,7 @@ with tab2:
                     locations='Country_iso3',
                     color='Amount',
                     hover_name='Country_iso3',
-                    color_continuous_scale='rdylgn',
+                    color_continuous_scale='portland',
                     title='Onde estamos vendendo mais? (valores absolutos)') # Added a color scale
         grafico_paises.update_layout(title_x=0.1)
         st.plotly_chart(grafico_paises, use_container_width=True)
@@ -104,7 +104,7 @@ with tab2:
                   title='Receita por país (USD)',
                   labels={'Amount': 'USD', 'Country': 'País'},
                   color='Amount',
-                  color_continuous_scale='rdylgn') 
+                  color_continuous_scale='portland') 
             grafico_receita_pais.update_layout(title_x=0.1)
             st.plotly_chart(grafico_receita_pais, use_container_width=True)
         else:
@@ -120,7 +120,7 @@ with tab2:
                  title='Ticket Médio por país (USD)',
                  labels={'Amount': 'USD', 'Country': 'País'},
                  color='Amount',
-                 color_continuous_scale='rdylgn')
+                 color_continuous_scale='portland')
             st.plotly_chart(ticket_medio, use_container_width=True)
         else:
             st.write(warning)
@@ -136,7 +136,7 @@ with tab2:
                  title='Top 5 Produtos mais vendidos',
                  labels={'Product': 'Produto', 'Boxes Shipped': 'Caixas'},
                  color='Boxes Shipped',
-                 color_continuous_scale='Greens')
+                 color_continuous_scale='algae')
             st.plotly_chart(qnt_por_pais, use_container_width=True)
         else:
             st.write(warning)
@@ -151,7 +151,7 @@ with tab2:
                  title='Top 5 Produtos que geram mais receita (USD)',
                  labels={'Amount': 'USD', 'Product': 'Produto'},
                  color='Amount',
-                 color_continuous_scale='Greens')
+                 color_continuous_scale='algae')
             st.plotly_chart(amount_por_pais, use_container_width=True)
         else:
             st.write(warning)
@@ -170,7 +170,7 @@ with tab3:
                  y='Amount',
                  title='Receita geral por trimestre',
                  color='Amount',
-                 color_continuous_scale='Blues',
+                 color_continuous_scale='teal',
                  labels={'Quarter': 'Trimestre', 'Amount': 'USD'})
             receita_trimestral_total.update_xaxes(tickvals=receita_trimestral['Quarter'])
             st.plotly_chart(receita_trimestral_total, use_container_width=True)
@@ -186,7 +186,7 @@ with tab3:
                  y='Boxes Shipped',
                  title='Quantidade de caixas vendidas (por trimestre)',
                  color='Boxes Shipped',
-                 color_continuous_scale='Blues',
+                 color_continuous_scale='Teal',
                  labels={'Quarter': 'Trimestre'})
             caixas_trimestral_total.update_xaxes(tickvals=qnt_caixas_trimestral['Quarter'])
             st.plotly_chart(caixas_trimestral_total, use_container_width=True)
@@ -222,7 +222,7 @@ with tab4:
                  title='Top 5 vendedores que geram mais receita (USD)',
                  labels={'Amount': 'USD', 'Vendedor': 'Produto'},
                  color='Amount',
-                 color_continuous_scale='reds')
+                 color_continuous_scale='amp')
             st.plotly_chart(top_receita_vendedor, use_container_width=True)
         else:
             st.write(warning)
@@ -237,12 +237,49 @@ with tab4:
                  title='Top 5 vendedores que venderam mais produtos',
                  labels={'Boxes Shipped': 'USD', 'Vendedor': 'Produto'},
                  color='Boxes Shipped',
-                 color_continuous_scale='reds')
+                 color_continuous_scale='amp')
             st.plotly_chart(top_caixas_vendedor, use_container_width=True)
         else:
             st.write(warning)
             
+with tab5:
+    if not df_filtrado.empty:
+        caixas_produto_enviadas = df.groupby('Product')['Boxes Shipped'].sum().reset_index()
+        valores_produto_enviado = df.groupby('Product')['Amount'].sum().reset_index()
+        media_caixa_valor = pd.merge(valores_produto_enviado, caixas_produto_enviadas, on='Product')
+        
+        media_caixa_valor['Valor_medio_produto'] = media_caixa_valor['Amount'] / media_caixa_valor['Boxes Shipped']
+        valor_medio_caixa_produto = px.bar(media_caixa_valor,
+             x='Product',
+             y='Valor_medio_produto',
+             title='Valor Médio por caixa de cada produto',
+             labels={'Product': 'Produto', 'Valor_medio_produto': 'USD'},
+             color='Valor_medio_produto',
+             color_continuous_scale='temps')
+        st.plotly_chart(valor_medio_caixa_produto, use_container_width=True)
+    else:
+        st.write(warning)
     
+    col_graf10, col_graf11 = st.columns(2)
+    
+    if not df_filtrado.empty:
+        product_summary = df.groupby('Product').agg({
+            'Boxes Shipped': 'sum',
+            'Amount': 'sum' }).reset_index()
+        fig = px.scatter(product_summary,
+                 x='Boxes Shipped',
+                 y='Amount',
+                 title='Relação entre o total de caixas e a receita total por produto',
+                 labels={'Boxes Shipped': 'Total de Caixas Enviadas', 'Amount': 'Valor Total da Venda'},
+                 color='Product',
+                 color_continuous_scale='Inferno',
+                 size='Amount',
+                 hover_data=['Product']) # Show product name on hover
+
+        fig.update_traces(textposition='top center')
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.write(warning)
     
 
 
