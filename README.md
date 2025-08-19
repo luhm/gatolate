@@ -4,7 +4,7 @@ Gatolate é uma loja (fictícia) de venda de chocolates. O CEO, Willy Wonka, sol
 
 Após uma conversa extensa, foram definidos alguns [blocos e KPIs](informacoes_gerais/kpis-inicial.md) de essenciais da análise.
 
-No decorrer do processo de análise e conversas da equipe com Willy Wonka, ficou decidido uma mudança na estrutura do dashboard. Assim, um mesmo dash poderia mostrar diferentes abas com os gráficos necessários para compreensão e tomada de decisões de negócio. Nesse momento, foi construído um novo documento com [blocos e KPIs]()
+No decorrer do processo de análise e conversas da equipe com Willy Wonka, ficou decidido uma mudança na estrutura do dashboard. Assim, um mesmo dash poderia mostrar diferentes abas com os gráficos necessários para compreensão e tomada de decisões de negócio. Nesse momento, foi construído um novo documento com [abas e KPIs revistos](informacoes_gerais/kpis-revisto.md)
 
 Para que toda a equipe tenha acesso e acompanhe o desenvolvimento desse projeto, este repositório foi criado com a seguinte estrutura:
 
