@@ -19,7 +19,7 @@ df['Date'] = pd.to_datetime(df['Date'], infer_datetime_format=True)
 
 # --- Criação das abas ---
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["Metricas gerais", "Onde vendemos e ganhamos mais", "Análises Trimestrais", "Análises por vendedor", "Análises por produto"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["Metricas gerais", "Onde vendemos e ganhamos mais", "Análises Temporais", "Análises por vendedor", "Análises por produto"])
 
 warning = "Nenhum dado para exibir no gráfico de países."
 
@@ -125,37 +125,7 @@ with tab2:
         else:
             st.write(warning)
 
-    col_graf4, col_graf5 = st.columns(2)
-
-    with col_graf4:
-        if not df_filtrado.empty:
-            product_qnt = df_filtrado.groupby('Product')['Boxes Shipped'].sum().sort_values(ascending=False).head(5).reset_index()
-            qnt_por_pais = px.bar(product_qnt,
-                 x='Product',
-                 y='Boxes Shipped',
-                 title='Top 5 Produtos mais vendidos',
-                 labels={'Product': 'Produto', 'Boxes Shipped': 'Caixas'},
-                 color='Boxes Shipped',
-                 color_continuous_scale='algae')
-            st.plotly_chart(qnt_por_pais, use_container_width=True)
-        else:
-            st.write(warning)
-     
-    with col_graf5:
-        if not df_filtrado.empty:
-            product_amount = df_filtrado.groupby('Product')['Amount'].sum().sort_values(ascending=False).head(5).reset_index()
-            amount_por_pais = px.bar(
-                product_amount,
-                 x='Product',
-                 y='Amount',
-                 title='Top 5 Produtos que geram mais receita (USD)',
-                 labels={'Amount': 'USD', 'Product': 'Produto'},
-                 color='Amount',
-                 color_continuous_scale='algae')
-            st.plotly_chart(amount_por_pais, use_container_width=True)
-        else:
-            st.write(warning)
-
+    
 with tab3:
     st.subheader("Análises por trimestre")
 
@@ -208,7 +178,8 @@ with tab3:
         st.plotly_chart(receita_trim_fixa, use_container_width=True)
     else:
         st.write(warning)
-
+    st.markdown("---")
+    
 with tab4:
     col_graf8, col_graf9 = st.columns(2)
     
@@ -220,7 +191,7 @@ with tab4:
                  x='Sales Person',
                  y='Amount',
                  title='Top 5 vendedores que geram mais receita (USD)',
-                 labels={'Amount': 'USD', 'Vendedor': 'Produto'},
+                 labels={'Amount': 'USD', 'Sales Person': 'Vendedor'},
                  color='Amount',
                  color_continuous_scale='amp')
             st.plotly_chart(top_receita_vendedor, use_container_width=True)
@@ -234,8 +205,8 @@ with tab4:
                 caixas_vendedor,
                  x='Sales Person',
                  y='Boxes Shipped',
-                 title='Top 5 vendedores que venderam mais produtos',
-                 labels={'Boxes Shipped': 'USD', 'Vendedor': 'Produto'},
+                 title='Top 5 vendedores com mais caixas vendidas',
+                 labels={'Boxes Shipped': 'Caixas', 'Sales Person': 'Vendedor'},
                  color='Boxes Shipped',
                  color_continuous_scale='amp')
             st.plotly_chart(top_caixas_vendedor, use_container_width=True)
@@ -281,6 +252,36 @@ with tab5:
     else:
         st.write(warning)
     
+    col_graf4, col_graf5 = st.columns(2)
+
+    with col_graf4:
+        if not df_filtrado.empty:
+            product_qnt = df_filtrado.groupby('Product')['Boxes Shipped'].sum().sort_values(ascending=False).head(5).reset_index()
+            qnt_por_pais = px.bar(product_qnt,
+                 x='Product',
+                 y='Boxes Shipped',
+                 title='Top 5 Produtos mais vendidos',
+                 labels={'Product': 'Produto', 'Boxes Shipped': 'Caixas'},
+                 color='Boxes Shipped',
+                 color_continuous_scale='algae')
+            st.plotly_chart(qnt_por_pais, use_container_width=True)
+        else:
+            st.write(warning)
+     
+    with col_graf5:
+        if not df_filtrado.empty:
+            product_amount = df_filtrado.groupby('Product')['Amount'].sum().sort_values(ascending=False).head(5).reset_index()
+            amount_por_pais = px.bar(
+                product_amount,
+                 x='Product',
+                 y='Amount',
+                 title='Top 5 Produtos que geram mais receita (USD)',
+                 labels={'Amount': 'USD', 'Product': 'Produto'},
+                 color='Amount',
+                 color_continuous_scale='algae')
+            st.plotly_chart(amount_por_pais, use_container_width=True)
+        else:
+            st.write(warning)
 
 
 
