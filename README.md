@@ -2,7 +2,7 @@
 
 Gatolate é uma loja (fictícia) de venda de chocolates. O CEO, Willy Wonka, solicitou à área de dados que providenciasse uma visão geral aprofundada da situação da empresa.
 
-Após uma conversa extensa, foram definidos alguns [blocos e KPIs](https://github.com/luhm/gatolate/blob/main/informacoes_gerais/kpis.md) de essenciais da análise.
+Após uma conversa extensa, foram definidos alguns [blocos e KPIs](informacoes_gerais/kpis-inicial.md) de essenciais da análise.
 
 No decorrer do processo de análise e conversas da equipe com Willy Wonka, ficou decidido uma mudança na estrutura do dashboard. Assim, um mesmo dash poderia mostrar diferentes abas com os gráficos necessários para compreensão e tomada de decisões de negócio. Nesse momento, foi construído um novo documento com [blocos e KPIs]()
 
