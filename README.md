@@ -1,6 +1,6 @@
 # Gatolate
 
-Gatolate é uma loja (fictícia) de venda de chocolates. O CEO, Willy Wonka, solicitou à área de dados que providenciasse uma visão geral aprofundada da situação da empresa.
+Gatolate é uma loja (fictícia) de venda de chocolates. O CEO, Willy Wonka, solicitou à área de dados que providenciasse uma visão geral aprofundada da situação da empresa. Wonka ubsca entender, com isso, onde a empresa pode focar para crescer e expandir seu mercado.
 
 Após uma conversa extensa, foram definidos alguns [blocos e KPIs](informacoes_gerais/kpis-inicial.md) de essenciais da análise.
 
@@ -20,7 +20,7 @@ Anteriormente, faríamos um dashboard para cada bloco; na nova estrutura, será 
 - Análises Temporais
 - Análises por vendedor
 - Análises por produto
-
+- Crescimento
 
 ## EDA
 

@@ -16,6 +16,7 @@ st.set_page_config(
 df = pd.read_csv("https://raw.githubusercontent.com/luhm/gatolate/refs/heads/main/data/chocolate_sales_cleaned.csv")
 
 df['Date'] = pd.to_datetime(df['Date'], infer_datetime_format=True)
+df['Month_Year'] = df['Date'].dt.to_period('M')
 
 # --- Criação das abas ---
 
@@ -33,11 +34,15 @@ paises_selecionados = st.sidebar.multiselect("Países", paises_disponiveis, defa
 vendedores_disponiveis = sorted(df['Sales Person'].unique())
 vendedores_selecionados = st.sidebar.multiselect("Vendedores", vendedores_disponiveis, default=vendedores_disponiveis)
 
+meses_disponiveis = sorted(df['Month_Year'].unique())
+meses_selecionados = st.sidebar.multiselect("Meses", meses_disponiveis, default=meses_disponiveis)
+
 # --- Filtragem do DataFrame ---
 # O dataframe principal é filtrado com base nas seleções feitas na barra lateral.
 df_filtrado = df[
     (df['Country'].isin(paises_selecionados)) &
-    (df['Sales Person'].isin(vendedores_selecionados))
+    (df['Sales Person'].isin(vendedores_selecionados)) &
+    (df['Month_Year'].isin(meses_selecionados))
 ]
 
 # --- Conteúdo Principal ---
@@ -171,6 +176,7 @@ with tab3:
              x='Amount',
              y='Quarter',
              color='Country',
+             color_continuous_scale='Portland',
              orientation='h',
              title='Receita por trimestre e por país',
              labels={'Quarter': 'Trimestre', 'Amount': 'Receita'})
@@ -193,7 +199,7 @@ with tab4:
                  title='Top 5 vendedores que geram mais receita (USD)',
                  labels={'Amount': 'USD', 'Sales Person': 'Vendedor'},
                  color='Amount',
-                 color_continuous_scale='amp')
+                 color_continuous_scale='algae')
             st.plotly_chart(top_receita_vendedor, use_container_width=True)
         else:
             st.write(warning)
@@ -201,17 +207,47 @@ with tab4:
     with col_graf9:
         if not df_filtrado.empty:
             caixas_vendedor = df_filtrado.groupby('Sales Person')['Boxes Shipped'].sum().sort_values(ascending=False).head(5).reset_index()
-            top_caixas_vendedor = px.bar(
+            principal_vendedor = px.bar(
                 caixas_vendedor,
                  x='Sales Person',
                  y='Boxes Shipped',
                  title='Top 5 vendedores com mais caixas vendidas',
                  labels={'Boxes Shipped': 'Caixas', 'Sales Person': 'Vendedor'},
                  color='Boxes Shipped',
-                 color_continuous_scale='amp')
-            st.plotly_chart(top_caixas_vendedor, use_container_width=True)
+                 color_continuous_scale='algae')
+            st.plotly_chart(principal_vendedor, use_container_width=True)
         else:
             st.write(warning)
+    
+    if not df_filtrado.empty:
+        salesperson_country_boxes = df_filtrado.groupby(['Sales Person', 'Country'])['Boxes Shipped'].sum().reset_index()
+        top_country_by_salesperson = salesperson_country_boxes.loc[salesperson_country_boxes.groupby('Sales Person')['Boxes Shipped'].idxmax()].reset_index(drop=True)
+        graf_top_boxes_person = px.bar(top_country_by_salesperson,
+            x='Boxes Shipped',
+            y='Sales Person',
+            color='Country',
+            title='País com Maior Número de Caixas Enviadas por Vendedor',
+            labels={'Sales Person': 'Vendedor', 'Boxes Shipped': 'Total de Caixas Enviadas', 'Country': 'País'},
+            color_discrete_sequence=px.colors.qualitative.Prism)
+        # graf_top_boxes_person.update_layout(xaxis={'categoryorder':'total descending'}) # Order bars by total boxes shipped
+        st.plotly_chart(graf_top_boxes_person, use_container_width=True)
+    else:
+        st.write(warning)
+   
+    if not df_filtrado.empty:
+        salesperson_average_amount = df.groupby('Sales Person')['Amount'].mean().sort_values(ascending=False).reset_index()
+        ticket_medio_vendedor = px.bar(salesperson_average_amount,
+            x='Sales Person',
+            y='Amount',
+            title='Ticket Médio por Vendedor',
+            labels={'Sales Person': 'Vendedor', 'Amount': 'USD'},
+            color='Amount',
+            color_continuous_scale='bugn') 
+        ticket_medio_vendedor.update_layout(xaxis={'categoryorder':'total descending'})
+        st.plotly_chart(ticket_medio_vendedor, use_container_width=True)
+    else:
+        st.write(warning)
+
             
 with tab5:
     if not df_filtrado.empty:
@@ -245,7 +281,8 @@ with tab5:
                  color='Product',
                  color_continuous_scale='Inferno',
                  size='Amount',
-                 hover_data=['Product']) # Show product name on hover
+                 hover_data=['Product'],
+                 color_discrete_sequence=px.colors.qualitative.Pastel) # Show product name on hover
 
         fig.update_traces(textposition='top center')
         st.plotly_chart(fig, use_container_width=True)
@@ -263,7 +300,7 @@ with tab5:
                  title='Top 5 Produtos mais vendidos',
                  labels={'Product': 'Produto', 'Boxes Shipped': 'Caixas'},
                  color='Boxes Shipped',
-                 color_continuous_scale='algae')
+                 color_continuous_scale='sunset')
             st.plotly_chart(qnt_por_pais, use_container_width=True)
         else:
             st.write(warning)
@@ -278,10 +315,26 @@ with tab5:
                  title='Top 5 Produtos que geram mais receita (USD)',
                  labels={'Amount': 'USD', 'Product': 'Produto'},
                  color='Amount',
-                 color_continuous_scale='algae')
+                 color_continuous_scale='sunset')
             st.plotly_chart(amount_por_pais, use_container_width=True)
         else:
             st.write(warning)
+
+    if not df_filtrado.empty:
+        # df['Month_Year'] = df['Date'].dt.to_period('M')
+        monthly_product_sales = df_filtrado.groupby(['Month_Year', 'Product'])['Amount'].sum().reset_index()
+        monthly_product_sales['Month_Year'] = monthly_product_sales['Month_Year'].astype(str)
+        receita_mensal_produto = px.bar(monthly_product_sales,
+              x='Product',
+              y='Amount',
+              color='Month_Year',
+              title='Receita mensal por produto',
+              labels={'Product': 'Produto', 'Amount': 'Receita'},
+              color_discrete_sequence=px.colors.qualitative.Pastel)
+        st.plotly_chart(receita_mensal_produto, use_container_width=True)
+    else:
+        st.write(warning)
+        
 
 
 

@@ -4,7 +4,7 @@
 
 Dados com valores absolutos mostrando as principais métricas para entendermos o estado atual do negócio em seu ápice.
 
-## Onde vendemos e ganhamos mais
+## Onde vendemos e ganhamos mais ✅
 
 Mostra uma análise mais geográfica, voltada para entender os dados com foco nos países que temos presença.
 
@@ -12,10 +12,9 @@ Mostra uma análise mais geográfica, voltada para entender os dados com foco no
   
 KPIs:
   - Receita (USD) por país
-  - Receita por país
   - Ticket médio por país
 
-## Análises Temporais
+## Análises Temporais ✅
 
 Análise com foco na sazonalidade dos dados, por exemplo análises mensais e trimestrais.
 
@@ -27,8 +26,10 @@ KPIs Temporais:
   - Receita geral (USD) por trimestre
   - Quantidade de caixas vendidas por trimestre
   - Receita por trimestre por país (visão geral)
+  - Crescimento percentual vs período anterior → ex.: receita Q2 comparada a Q1.
+  - Sazonalidade por mês → linha do tempo mais detalhada para ver picos (como Páscoa e Natal).
 
-## Análises por vendedor
+## Análises por vendedor ✅
 
 Análise focada em informações de RH e avaliação resultados individuais de nossos colaboradores.
 
@@ -37,8 +38,10 @@ Análise focada em informações de RH e avaliação resultados individuais de n
 KPIs:
   - Vendedores que geram mais receita (USD, top 5)
   - Vendedores líderes em quantidade de caixas (USD, top5)
+  - Ticket médio por vendedor → mostra quem vende menos em volume, mas consegue gerar mais valor.
 
-## Análises por produto
+
+## Análises por produto ✅
 
 Análise com foco na compreensão dos nossos produtos mais desejados e os que geram maior receita.
 
@@ -51,3 +54,19 @@ KPIs:
   - Relação entre total de caixas e receita total por produto
   - Top 5 produtos mais vendidos
   - Top 5 produtos que geram mais receita
+  - qual produto vendeu mais por mes e por trimestre
+
+## Crescimento
+
+**Pergunta**: Para onde estamos indo?
+
+KPIs:
+  - Receita acumulada no ano (YTD)
+  - Meta vs realizado (se quiser simular metas de vendas)
+  - Projeção de receita para o próximo trimestre (baseada em médias históricas).
+
+## Filtros ✅
+
+- País
+- Vendedor
+- Mês (da para colocar esse filtro apenas em uma aba?)
