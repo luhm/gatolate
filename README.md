@@ -13,7 +13,7 @@ Para que toda a equipe tenha acesso e acompanhe o desenvolvimento desse projeto,
 - Na pasta `dashboards` é possível encontrar o código completo do deploy do dashboard no streamlit.
 - Na pasta `informacoes_gerais` é possível ver o documentos construídos durante as conversas com stakeholders.
 ---
-Anteriormente, faríamos um dashboard para cada bloco; na nova estrutura, será um dashboard com as seguintes abas:
+Anteriormente, faríamos um dashboard para cada bloco; na nova estrutura, foi feito apenas [um dashboard](https://gatolate-nwdrhxfk9l7gwmrbgxqrge.streamlit.app/) com as seguintes abas:
 
 - Metricas gerais
 - Onde vendemos e ganhamos mais
