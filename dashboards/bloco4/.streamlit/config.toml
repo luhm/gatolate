@@ -1,0 +1,12 @@
+[server]
+port = 80
+
+[theme]
+textColor = "#583101"
+backgroundColor = "#FEFEFA"
+
+
+[theme.sidebar]
+primaryColor = "#A47148"
+backgroundColor = "#edc9af"
+secondaryBackgroundColor = "#FEFEFA"

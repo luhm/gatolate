@@ -2,6 +2,7 @@ import streamlit as st ##serve para criar aplicações
 import pandas as pd
 import numpy as np
 import plotly.express as px
+from sklearn.linear_model import LinearRegression
 
 
 # --- Configuração da Página ---
@@ -17,10 +18,11 @@ df = pd.read_csv("https://raw.githubusercontent.com/luhm/gatolate/refs/heads/mai
 
 df['Date'] = pd.to_datetime(df['Date'], infer_datetime_format=True)
 df['Month_Year'] = df['Date'].dt.to_period('M')
+df['Quarter'] = df['Date'].dt.quarter
 
 # --- Criação das abas ---
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["Metricas gerais", "Onde vendemos e ganhamos mais", "Análises Temporais", "Análises por vendedor", "Análises por produto"])
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["Metricas gerais", "Onde vendemos e ganhamos mais", "Análises Temporais", "Análises por vendedor", "Análises por produto", "Crescimento"])
 
 warning = "Nenhum dado para exibir no gráfico de países."
 
@@ -44,6 +46,11 @@ df_filtrado = df[
     (df['Sales Person'].isin(vendedores_selecionados)) &
     (df['Month_Year'].isin(meses_selecionados))
 ]
+
+# Varáveis reutilizáveis
+
+receita_trimestral = df_filtrado.groupby('Quarter')['Amount'].sum().reset_index()
+meta_receita = 8_000_000
 
 # --- Conteúdo Principal ---
 
@@ -138,8 +145,8 @@ with tab3:
 
     with col_graf6:
         if not df_filtrado.empty:
-            df_filtrado['Quarter'] = df_filtrado['Date'].dt.quarter
-            receita_trimestral = df_filtrado.groupby('Quarter')['Amount'].sum().reset_index()
+            # df_filtrado['Quarter'] = df_filtrado['Date'].dt.quarter
+            # receita_trimestral = df_filtrado.groupby('Quarter')['Amount'].sum().reset_index()
             receita_trimestral_total = px.bar(receita_trimestral,
                  x='Quarter',
                  y='Amount',
@@ -335,8 +342,99 @@ with tab5:
     else:
         st.write(warning)
         
+with tab6:
+    df_filtrado['Year'] = df['Date'].dt.year
+    receita_anual = df_filtrado.groupby('Year')['Amount'].sum().reset_index()
+    receita_atual = receita_anual['Amount'].sum()
+    receita_faltante = meta_receita - receita_atual
+    
+    
+    # Create a DataFrame for plotting
+    df_meta_comparacao = pd.DataFrame({
+        'Category': ['Receita Atual', 'Falta para a Meta'],
+        'Amount': [receita_atual, receita_faltante],
+        'Color': ['Current', 'Remaining'] # Helper column for coloring
+    })
+    
+    st.markdown(f"### A meta anual de receita é ${meta_receita} USD")
+        
+    if not df_filtrado.empty:
+        # novas variáveis e dataframes essenciais para esse calculo preditivo
+        x = receita_trimestral['Quarter'].values.reshape(-1, 1)
+        y = receita_trimestral['Amount'].values
+        model = LinearRegression()
+        model.fit(x, y)
+        next_quarter = np.array([[receita_trimestral['Quarter'].max() + 1]])
+        predicted_revenue = model.predict(next_quarter)
+        predicted_df = pd.DataFrame({
+            'Quarter': [next_quarter[0][0]],
+            'Amount': [predicted_revenue[0]],
+            'Type': ['Previsão']
+        })
+        # Calculate total historical revenue
+        total_historical_revenue = receita_trimestral['Amount'].sum()
+        # Get the predicted revenue for the next quarter
+        predicted_next_quarter_revenue = predicted_df['Amount'].iloc[0]
+        # Calculate the total revenue including the prediction
+        total_revenue_with_prediction = total_historical_revenue + predicted_next_quarter_revenue
+        # Create DataFrames for plotting
+        # Quarterly data for historical and predicted revenue
+        quarterly_plot_df = pd.concat([receita_trimestral.assign(Type='Histórico'), predicted_df], ignore_index=True)
+        # Data for Projected Total Revenue - we will associate this with the last quarter for plotting simplicity
+        projected_data = pd.DataFrame({
+            'Quarter': [quarterly_plot_df['Quarter'].max()],
+            'Amount': [total_revenue_with_prediction],
+            'Type': ['Receita Projetada']
+        })
+        # Combine historical, predicted, and projected data for plotting
+        all_plot_df = pd.concat([quarterly_plot_df, projected_data], ignore_index=True)
+        # Create the line chart
+        receita_prevista = px.line(all_plot_df,
+                  x='Quarter',
+                  y='Amount',
+                  color='Type',
+                  title='Receita Trimestral (Histórico, Previsão e Projetada) com Meta Anual',
+                  labels={'Quarter': 'Trimestre', 'Amount': 'Receita (USD)', 'Type': 'Tipo'},
+                  markers=True, # Add markers for data points
+                  color_discrete_sequence=px.colors.qualitative.Bold)
+                    #   color_discrete_map={'Histórico': 'blue', 'Previsão': 'red', 'Receita Projetada': 'orange'})
+        # Add a horizontal line for the annual goal
+        receita_prevista.add_shape(type="line",
+                      x0=all_plot_df['Quarter'].min(), y0=meta_receita, x1=all_plot_df['Quarter'].max(), y1=meta_receita,
+                      line=dict(color="green", width=2, dash="dash"),
+                      name='Meta Anual')
+        # Add annotations for the annual goal line
+        receita_prevista.add_annotation(
+            x=all_plot_df['Quarter'].max(),
+            y=meta_receita,
+            text=f'Meta Anual: ${meta_receita:,.0f}',
+            showarrow=False,
+            xanchor='right',
+            yanchor='bottom',
+            bgcolor="white",
+            opacity=0.8
+        )
+        receita_prevista.update_xaxes(tickvals=all_plot_df['Quarter'].unique())
+        receita_prevista.update_traces(mode='lines+markers', marker=dict(size=18))
+        st.plotly_chart(receita_prevista, use_container_width=True)
+    else:
+        st.write(warning)
+            
+    col_graf12, col_graf13 = st.columns(2)
+    
+    with col_graf12:
+        if not df_filtrado.empty:
+            receita_comparada = px.pie(df_meta_comparacao,
+                         names='Category',
+                         values='Amount',
+                         color='Color',
+                         color_discrete_sequence=px.colors.qualitative.Safe,
+                        #  color_discrete_map={'Current': 'pink', 'Remaining': 'purple'},
+                         title='Receita Anual vs. Meta')
+            st.plotly_chart(receita_comparada, use_container_width=True)
+        else:
+            st.write(warning)
 
+        
 
-
-
-
+         
